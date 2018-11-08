@@ -1,23 +1,4 @@
-/*----------------------------------
-Class Definition
-----------------------------------*/
-
-class Variable{
-    constructor(props){
-        this.name = porps.name
-        this.type = props.type
-        this.val = props.val
-    }
-
-    get name(){ return this._name }
-    get type(){ return this._type }
-    get val(){ return this._val }
-    set name(v){ this._name = v }
-    set type(v){ this._type = v }
-    set val(v){ this._val = v }
-}
-
-
+import VariableModel from "./modules/model/VariableModel.js";
 
 /*----------------------------------
 ACE API
@@ -40,8 +21,6 @@ var testFlag = false;
 if(i>3){
     testFlag = true;
 }
-
-
 `);
 //debug('editor.getValue()',editor.getValue());
 //debug('editor.getLine(0)',editor.session.getLine(0));
@@ -49,43 +28,96 @@ if(i>3){
 
 for(let i=0; i<editor.session.getLength(); i++){
     const code = editor.session.getLine(i);
-    translateController(code);
-    console.log('変数調査: ' + translateController(code));
+    //translateController(code);
+    //console.log('変数調査: ' + translateController(code));
 }
+
+
+
+
 
 
 /*----------------------------------
 Translate Rule Definition (Controller)
 ----------------------------------*/
+class TranslateController{
+    constructor(props){
+        this.result;
+        this.code = props;
+        this.flag = this.isVariableExist(this.code);
 
-function translateController(code){
-    var result;
-    var flag = isVariableExist(code);
-    // var, let, const があったら変数宣言と見なす
-    if(flag!=false){
-        const operand = code.replace(/\s/g,'').split('=');
-        const leftOpe = operand[0].slice(flag.length,operand[0].length);
-        const rightOpe = operand[1].replace(';','');
-        result = `変数(${flag}) ${leftOpe} に ${rightOpe} が代入されました。`;
+        if(this.flag!=false){
+            const operand = this.code.replace(/\s/g,'').split('=');
+            const leftOpe = operand[0].slice(this.flag.length,operand[0].length);
+            const rightOpe = operand[1].replace(';','');
+            this.result = `変数(${this.flag}) ${leftOpe} に ${rightOpe} が代入されました。`;
+        }
+
+        console.log(this.result);
     }
-    return result;
-    
-    function isVariableExist(code){
+
+    getCode(){
+
+    }
+
+    isVariableExist(code){
         let result = code.slice(0,5);
         if(result == 'const')return result;
         result = code.slice(0,3);
         if(result == 'var' || result == 'let')return result;
-        return false;
+        return false;    
     }
-
-    function separateOperand(){
-
-    }
-
-
 }
 
 
+
+
+/*----------------------------------
+Class Test
+----------------------------------*/
+const tc = new TranslateController(editor.session.getLine(1));
+
+const varArr = new VariableModel({
+    name: 'hoge1',
+    type: 'hoge2',
+    val: 'hoge3'
+});
+
+
+
+
+
+
+// function translateController(code){
+//     var result;
+//     var flag = isVariableExist(code);
+//     // var, let, const があったら変数宣言と見なす
+//     if(flag!=false){
+//         const operand = code.replace(/\s/g,'').split('=');
+//         const leftOpe = operand[0].slice(flag.length,operand[0].length);
+//         const rightOpe = operand[1].replace(';','');
+//         result = `変数(${flag}) ${leftOpe} に ${rightOpe} が代入されました。`;
+//     }
+//     return result;
+    
+//     function isVariableExist(code){
+//         let result = code.slice(0,5);
+//         if(result == 'const')return result;
+//         result = code.slice(0,3);
+//         if(result == 'var' || result == 'let')return result;
+//         return false;
+//     }
+
+//     function separateOperand(){
+
+//     }
+
+
+// }
+
+/*----------------------------------
+View
+----------------------------------*/
 
 
 
