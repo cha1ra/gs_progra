@@ -9,13 +9,25 @@ $space:8px;
 
 header{
     border-bottom: 1px solid #8CD790;
-    #logo{
-        width:150px;
-        height: auto;
+    .container{
+        #logo{
+            width:150px;
+            height: auto;
+        }
+        nav{
+            display: flex;
+            justify-content:flex-end;
+            li{
+                list-style: none;
+            }
+    
+        }
     }
 }
 
-
+#body{
+    position: absolute;
+}
 
 main{
     .container{
@@ -26,6 +38,28 @@ main{
         }
     }
 }
+
+#editor{
+    width: 400px;
+    height: 600px;
+}
+
+#grammer{
+    //background-color: yellow;
+    border-right: 1px solid #757575;
+    p{
+        padding: 4px;
+    }
+    p:hover{
+        transition: 0.5s;
+        background-color: #c5e99b;   
+    }
+}
+
+#graphic{
+    //background-color: aqua;
+}
+
 
 
 footer{

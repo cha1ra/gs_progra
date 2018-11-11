@@ -4,9 +4,9 @@ ref. https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Reserved_Wor
 ----------------------------------*/
 
 const reservedWords = {
-    const: 'variable',
-    let: 'variable',
-    var: 'variable',
+    const: 'var',
+    let: 'var',
+    var: 'var',
 
     if: 0 ,
     else: 0 ,
@@ -51,6 +51,11 @@ const reservedWords = {
     
 }
 
+const objects = {
+    console:{
+        log:0
+    }
+}
 
 
 

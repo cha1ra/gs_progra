@@ -1,7 +1,8 @@
 export class GrammerView{
     constructor(props){
         // this.code = props.code;
-
+        this.onSendCallBack = props.onSendCallBack;
+        //console.log(this.onSendCallBack);
         this.init();
     }
 
@@ -21,6 +22,29 @@ export class GrammerView{
     }
 
     handleEvents(){
+        this.editor.getSession().on('change', (e)=>{
+            if(e.lines[0]==';'){
+                console.log(';を発見！');
+                this.onSendCallBack();
+            }
+        });
+
+        $('#grammer').on('click',()=>{
+            console.log('html' + $(this).text());
+        })
+
+        // $(document).on({
+        //     'mouseenter' : ()=>{
+        //         $(this).html('background-color');
+        //     },
+        //     'mouseleave' : ()=>{
+        //         $(this).css('background-color', "#white")
+        //     }
+        // },'#grammer > p');
+    }
+
+    clearText(){
+        this.$grammer.empty();
     }
 
     appendText(text){
@@ -37,17 +61,8 @@ export class GrammerView{
         this.editor.session.setMode("ace/mode/javascript");
 
         this.editor.setValue(`
-let test = 12;
-i = i + 2;
-i += 2;
-console.log(i);
-const j = 'へーい';
-console.log(j);
-var testFlag = false;
-
-if(i==3){
-    testFlag = true;
-}
+let test = 1;
+test = 3;
         `);
     }
 

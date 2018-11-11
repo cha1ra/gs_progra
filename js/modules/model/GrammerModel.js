@@ -24,44 +24,107 @@ export class GrammerModel{
     }
 
 
-    translateToLanguage(code, lineNum){
-        console.log(this.countEqualNum(code));
+    translateToText(code, lineNum){
+        //console.log(this.countEqualNum(code));
         var code = code.replace(/^\s*/,''); //先頭のスペースorタブを削除
-        //console.log(inputCode);
+        //console.log(code);
         var outputText;
         this.reservedWord = this.isReservedWordsExist(code);
-        outputText = this.switchTranslateRules(this.reservedWord, code, lineNum);
+        //console.log(this.reservedWord);
+        outputText = this.translateByRules(this.reservedWord, code, lineNum);
         return outputText;
     }
 
-    switchTranslateRules(reservedWord, code, lineNum){
-        console.log(reservedWord,code);
-        var result;
-        switch(reservedWords[reservedWord]){
-            case 'variable':
-                result = this.translateVariable(reservedWord, code, lineNum);
-                break;
-            case false:
-                if(this.isEqualExist(code)){
-                    result = this.translateExpression(code);
+    translateByRules(reservedWord, code, lineNum){
+        //console.log('reservedWord = ' + reservedWord);
+        const result = () => {
+            if(reservedWord != false){ //予約語があった場合
+                switch(reservedWords[reservedWord]){
+                    case 'var':
+                        return this.translateVariable(reservedWord, code, lineNum);
+                        // break;
+                    default:
+                        return '翻訳中...';
                 }
-                break;
+            }else{ //予約語がなかった場合
+
+                //イコールがあったら
+                if(this.isEqualExist(code)){
+                    return this.translateExpression(code, lineNum);
+                }
+                return '翻訳中...';
+            }
         }
-        return result;
+        return result();
     }
 
     translateVariable(reservedWord, code, lineNum){
-        var result;
-        const operand = this.removeSpace(code).split('=');
-        const leftOpe = operand[0].slice(reservedWord.length,operand[0].length);
-        const rightOpe = operand[1].replace(';','');
-        result = `<p class="line${lineNum+1}">変数(${reservedWord}) ${leftOpe} に ${rightOpe} を代入します。</p>`
-        return result;
+        const result = () =>{
+            const operand = this.getEachOperand(code);
+            const leftOpe = operand[0].slice(reservedWord.length,operand[0].length);
+            const rightOpe = operand[1];
+            return `<p class="line${lineNum+1}">変数(${reservedWord}) ${leftOpe} に ${rightOpe} を代入します。</p>`
+        }
+        return result();
     }
 
-    translateExpression(code){
+    translateExpression(code, lineNum){
+        switch (this.countEqualNum(code)){
+            case 1:
+                console.log('hit!');
+                //論理演算子？
 
+                //論理演算子じゃない時
+                return this.calcExpression(code);
+                break;
+            case 2:
+            case 3:
+                return this.calcConditionalExp(code);
+                break;
+        }
+        return false;
+    }
 
+    //左辺に右辺を代入する系
+    calcExpression(code, lineNum){
+        console.log('Num = Num');
+        // A = a の場合
+        console.log(code);
+        const operand = this.getEachOperand(code);
+        let leftOpe = operand[0];
+        let rightOpe = operand[1];
+        console.log(operand);
+        return `<p class="line${lineNum+1}">${leftOpe} に ${rightOpe} を代入します。<br>
+        その結果、${leftOpe}の値は${eval(rightOpe)}になります</p>`
+
+        // A = a + b の場合
+
+        // A += a の場合
+
+        // A = function(){} の場合
+        // A = () => の 場合
+        // A = [a, b, c] の場合
+        // A = {key: a} の場合
+
+    }
+
+    calcConditionalExp(code){
+
+    }
+
+    /**
+    * @param {String} code オペランドを取り出したいコード
+    * @return {Array}
+    */
+    getEachOperand(code){
+        const result = () =>{
+            var val = this.removeSpace(code).split('=');
+            val[1] = val[1].slice(0,-1);
+            return val;
+        };
+        // console.log(code);
+        // console.log(result());
+        return result();
     }
 
     removeSpace(code){
@@ -70,9 +133,9 @@ export class GrammerModel{
 
     countEqualNum(code){
         const eNum = code.split('=').length - 1; //イコールのカウントロジックを変更する
-        console.log('eNum = ' + eNum);
+        //console.log('eNum = ' + eNum);
         if(eNum == null) return 0;
-        else return eNum.length;
+        else return eNum;
     }
 }
 

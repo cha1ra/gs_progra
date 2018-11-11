@@ -6,9 +6,22 @@ header {
   border-bottom: 1px solid #8CD790;
 }
 
-header #logo {
+header .container #logo {
   width: 150px;
   height: auto;
+}
+
+header .container nav {
+  display: flex;
+  justify-content: flex-end;
+}
+
+header .container nav li {
+  list-style: none;
+}
+
+#body {
+  position: absolute;
 }
 
 main .container {
@@ -18,6 +31,24 @@ main .container {
 
 main .container #translation {
   border: 1px solid #8CD790;
+}
+
+#editor {
+  width: 400px;
+  height: 600px;
+}
+
+#grammer {
+  border-right: 1px solid #757575;
+}
+
+#grammer p {
+  padding: 4px;
+}
+
+#grammer p:hover {
+  transition: 0.5s;
+  background-color: #c5e99b;
 }
 
 footer {

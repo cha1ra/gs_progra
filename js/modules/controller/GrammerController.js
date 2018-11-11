@@ -1,12 +1,13 @@
 import GrammerModel from "../model/GrammerModel.js";
 import VariableModel from "../model/VariableModel.js";
 import GrammerView from "../view/GrammerView.js"
+// import GraphicController from './GraphicController.js';
 
 export class TranslateController{
     constructor(props){
         console.log('props : ' + props.for);
         // this.codes = props;
-
+        this.bindMethods();
         this.init();
 
         // const result = this.gm.translateToLanguage(this.codes);
@@ -19,21 +20,41 @@ export class TranslateController{
     }
 
     init(){
-        this.gv = new GrammerView();
+        this.gv = new GrammerView({
+            onSendCallBack: this.translateEachCords
+        });
         this.gm = new GrammerModel();
+        this.vm = {}
     }
 
-    getCode(){
-
+    bindMethods(){
+        this.translateEachCords = this.translateEachCords.bind(this);
     }
+
+
+    /*----------------------------------
+    Grammer Controller
+    ----------------------------------*/
 
     translateEachCords(){
+        this.gv.clearText();
         const codes = this.gv.getCodes().split('\n');
         codes.forEach((el, i) => {
             //console.log(el);
-            this.gv.appendText(this.gm.translateToLanguage(el, i));
+            try{
+                this.gv.appendText(this.gm.translateToText(el, i));
+            }
+            catch(e){
+                console.log(e);
+            }
         });
     }
+
+
+    /*----------------------------------
+    Graphic Controller
+    ----------------------------------*/
+
 }
 
 /*----------------------------------
