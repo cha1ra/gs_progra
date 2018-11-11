@@ -6,4 +6,4 @@ import GrammerController from "./modules/controller/GrammerController.js"
 //     //console.log('変数調査: ' + translateController(code));
 // }
 
-const gc = new GrammerController(reservedWords);
+const gmc = new GrammerController(reservedWords);

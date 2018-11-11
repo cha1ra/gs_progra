@@ -43,6 +43,7 @@ main .container #translation {
 }
 
 #grammer p {
+  transition: 0.5s;
   padding: 4px;
 }
 

@@ -1,12 +1,11 @@
-export class GrammerView{
+export class GraphicView{
     constructor(props){
         // this.code = props.code;
-
+        this.onSendCallBack = props.onSendCallBack;
         this.init();
     }
 
     init(){
-        this.loadAceSettings();
         this.bindDomElement();
     }
 
@@ -16,7 +15,24 @@ export class GrammerView{
 
 
     bindDomElement(){
-        this.$translation = $('#translation');
+        this.$graphic = $('#graphic');
     }
+
+    clearGraphicDiv(){
+        this.$graphic.empty();
+    }
+
+    // appendToGraphicDiv(text){
+    //     this.$graphic.append(text);
+    // }
+
+    appendVariable(variable){
+        console.log(variable);
+        for(let key in variable){
+
+            this.$graphic.append(`<p>${key} = ${variable[key].val}</p>`);
+        }
+    }
+
 }
-export default GrammerView
+export default GraphicView

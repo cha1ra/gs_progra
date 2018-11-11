@@ -1,7 +1,6 @@
 import GrammerModel from "../model/GrammerModel.js";
-import VariableModel from "../model/VariableModel.js";
 import GrammerView from "../view/GrammerView.js"
-// import GraphicController from './GraphicController.js';
+import GraphicView from "../view/GraphicView.js"
 
 export class TranslateController{
     constructor(props){
@@ -14,21 +13,24 @@ export class TranslateController{
         // this.gv.appendText(result);
 
         this.translateEachCords();
-
+        this.gpv.appendVariable(this.gmm.variable);
         
 
     }
 
     init(){
-        this.gv = new GrammerView({
+        this.gmv = new GrammerView({
             onSendCallBack: this.translateEachCords
         });
-        this.gm = new GrammerModel();
-        this.vm = {}
+        this.gmm = new GrammerModel();
+        this.gpv = new GraphicView({
+            onSendCallback: this.drawCords
+        });
     }
 
     bindMethods(){
         this.translateEachCords = this.translateEachCords.bind(this);
+        this.drawCords = this.drawCords.bind(this);
     }
 
 
@@ -37,17 +39,18 @@ export class TranslateController{
     ----------------------------------*/
 
     translateEachCords(){
-        this.gv.clearText();
-        const codes = this.gv.getCodes().split('\n');
+        this.gmv.clearText();
+        const codes = this.gmv.getCodes().split('\n');
         codes.forEach((el, i) => {
             //console.log(el);
-            try{
-                this.gv.appendText(this.gm.translateToText(el, i));
-            }
-            catch(e){
-                console.log(e);
-            }
+            // try{
+                this.gmv.appendText(this.gmm.translateToText(el, i));
+            // }
+            // catch(e){
+            //     console.log('!-------エラーだってよ--------!');
+            // }
         });
+        console.log('result')
     }
 
 
@@ -55,20 +58,11 @@ export class TranslateController{
     Graphic Controller
     ----------------------------------*/
 
+    drawCords(){
+        this.gpv.appendVariable(this.gmm.variable);
+    }
+
 }
-
-/*----------------------------------
-Class Test
-----------------------------------*/
-
-const varArr = new VariableModel({
-    name: 'hoge1',
-    type: 'hoge2',
-    val: 'hoge3'
-});
-
-
-
 
 
 /*----------------------------------

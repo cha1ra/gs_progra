@@ -1,3 +1,5 @@
+import VariableModel from "./VariableModel.js";
+
 export class GrammerModel{
     constructor(props){
         // this.codes = props.codes;
@@ -6,8 +8,12 @@ export class GrammerModel{
         this.init();
     }
     init(){
-
+        this.variable = {};
     }
+
+    /*----------------------------------
+    Boolean Function
+    ----------------------------------*/
     
     isReservedWordsExist(code){
         for (let reservedWord in reservedWords){
@@ -17,12 +23,15 @@ export class GrammerModel{
         }
         return false;
     }
-
+    
     isEqualExist(code){
         if(code.indexOf('='))return true;
         return false;
     }
-
+    
+    /*----------------------------------
+    Grammer
+    ----------------------------------*/
 
     translateToText(code, lineNum){
         //console.log(this.countEqualNum(code));
@@ -63,6 +72,9 @@ export class GrammerModel{
             const operand = this.getEachOperand(code);
             const leftOpe = operand[0].slice(reservedWord.length,operand[0].length);
             const rightOpe = operand[1];
+            //TODO: return を要素だけ返すようにする
+            this.addVariable(leftOpe, code);
+
             return `<p class="line${lineNum+1}">変数(${reservedWord}) ${leftOpe} に ${rightOpe} を代入します。</p>`
         }
         return result();
@@ -89,17 +101,21 @@ export class GrammerModel{
     calcExpression(code, lineNum){
         console.log('Num = Num');
         // A = a の場合
-        console.log(code);
+        // console.log(code);
         const operand = this.getEachOperand(code);
         let leftOpe = operand[0];
         let rightOpe = operand[1];
-        console.log(operand);
+        //console.log(operand);
+        //TODO: 変数を変更する系の処理をまとめる
+        this.changeVariableVal(leftOpe, this.evalExpression(rightOpe));
+        //console.log(this.variable);
         return `<p class="line${lineNum+1}">${leftOpe} に ${rightOpe} を代入します。<br>
-        その結果、${leftOpe}の値は${eval(rightOpe)}になります</p>`
+        その結果、${leftOpe}の値は${this.variable[leftOpe]['val']}になります</p>`
 
-        // A = a + b の場合
 
-        // A += a の場合
+        // A += a の場合(NOT 論理演算子)
+        // A != a の場合(論理演算子)
+        
 
         // A = function(){} の場合
         // A = () => の 場合
@@ -108,8 +124,24 @@ export class GrammerModel{
 
     }
 
+    isCodeLogicalOperatpr(code){
+
+    }
+
+
     calcConditionalExp(code){
 
+    }
+
+    evalExpression(exp){
+        console.log('ここで右辺に変数があったら代入処理をする');
+        //変数があるかどうかの判定
+        for(let key in this.variable){
+            let reg = new RegExp(key, 'g'); //正規表現に変数をもちいる方法
+            console.log(reg);
+            exp = exp.replace(reg,this.variable[key]['val']);
+        }
+        return eval(exp);
     }
 
     /**
@@ -119,7 +151,7 @@ export class GrammerModel{
     getEachOperand(code){
         const result = () =>{
             var val = this.removeSpace(code).split('=');
-            val[1] = val[1].slice(0,-1);
+            val[1] = val[1].slice(0,-1);//TODO: ;を取り除く処理の記述
             return val;
         };
         // console.log(code);
@@ -137,6 +169,37 @@ export class GrammerModel{
         if(eNum == null) return 0;
         else return eNum;
     }
+
+    /*----------------------------------
+    Variable
+    ----------------------------------*/
+    //変数・定数が宣言されているときに
+    addVariable(varName, code){
+        console.log(varName,code);
+        console.log('変数を代入');
+        const value = this.evalVariable(varName,code);
+        this.variable[varName] = {
+            val: value,
+            type: typeof value
+        }
+
+        console.log('!!------------!!');
+        console.log(this.variable[varName].val);
+        console.log(this.variable[varName].type);
+    }
+
+    changeVariableVal(varName, val){
+        this.variable[varName]['val'] = val;
+        return false;
+    }
+
+    evalVariable(varName, code){
+        return new Function(`${code} return ${varName}`)();
+    }
+
+    get variable(){return this._variable;}
+    set variable(v){this._variable = v;}
+
 }
 
 export default GrammerModel

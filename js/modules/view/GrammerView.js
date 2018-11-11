@@ -28,19 +28,6 @@ export class GrammerView{
                 this.onSendCallBack();
             }
         });
-
-        $('#grammer').on('click',()=>{
-            console.log('html' + $(this).text());
-        })
-
-        // $(document).on({
-        //     'mouseenter' : ()=>{
-        //         $(this).html('background-color');
-        //     },
-        //     'mouseleave' : ()=>{
-        //         $(this).css('background-color', "#white")
-        //     }
-        // },'#grammer > p');
     }
 
     clearText(){
@@ -63,6 +50,8 @@ export class GrammerView{
         this.editor.setValue(`
 let test = 1;
 test = 3;
+test = 3+4+5;
+test = test + 1;
         `);
     }
 

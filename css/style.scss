@@ -48,6 +48,7 @@ main{
     //background-color: yellow;
     border-right: 1px solid #757575;
     p{
+        transition: 0.5s;
         padding: 4px;
     }
     p:hover{
