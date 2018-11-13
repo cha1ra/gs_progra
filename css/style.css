@@ -54,6 +54,10 @@ main .container #translation {
   font-size: 1.1rem;
 }
 
+#grammer .func {
+  background-color: #c5e99b;
+}
+
 #grammer p:hover {
   transition: 0.5s;
   background-color: #c5e99b;

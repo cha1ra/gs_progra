@@ -8,6 +8,7 @@ export class GrammerModel{
         this.init();
     }
     init(){
+        this.mainLineNum = [];
         this.variableObj = {};
         this.functionObj = {};
         this.controlStatements = [];
@@ -19,11 +20,12 @@ export class GrammerModel{
     Define Function Position
     ----------------------------------*/
     defineFunctionPos(code, lineNum){
+        let isFunctionExist = false;
+
         //function の予約語があるかどうかを調べる(始まる点を調べる)
-        console.log(this.isResWdNameFuncExist(code), lineNum)
         //予約語があったらファンクションオブジェクトを生成する
         if(this.isResWdNameFuncExist(code)){
-            //TODO: 変数に含まれているか、functionで定義されているかをつまびらかにするべし。
+            //FIXME: 変数に含まれているか、functionで定義されているかをつまびらかにするべし。
             //現在は頭にfuncitonがついていると言う前提で話を進める。
             //'function'と'('の間にある文字列を取得する
             console.log(this.getFuncName(code));
@@ -32,33 +34,47 @@ export class GrammerModel{
                 endLineNum: 0,
                 // countRoundBracketStart: 0,
                 // countBracketEnd: 0,
-                arugument: '',
+                argument: '',
                 countCurlyBracketStart: 0,
-                countCurlyBraketEnd: 0,
+                countCurlyBracketEnd: 0,
             }
         }
-        //引数を取得する。丸括弧の開始数、終了数が同数
         
 
         //functionとして定義されているものは情報を舐める。もしendlinenumが定義されていれば情報は全て揃っているとみなし、処理は行わない
         for(const key in this.functionObj){
-            if(this.functionObj[key].endLineNum != 0) continue;
-            //TODO: functionが書いてある行に()がある前提のコードになっている
-            if(this.functionObj[key].argument == 0){
-                this.functionObj[key].argument = code.slice(
-                    code.indexOf('(') + 1,
-                    code.lastIndexOf(')')
-                )
+            if(this.functionObj[key].endLineNum != 0){
+                continue;
+            }else{
+                //引数の取得
+                //FIXME: functionが書いてある行に()がある前提のコードになっている
+                if(this.functionObj[key].argument == 0){
+                    this.functionObj[key].argument = code.slice(
+                        code.indexOf('(') + 1,
+                        code.lastIndexOf(')')
+                    ).split(',');
+                }
+    
+                //{と}の数の分だけカウンターを上下
+                this.functionObj[key].countCurlyBracketStart += this.countValNum(code,'{');
+                this.functionObj[key].countCurlyBracketEnd += this.countValNum(code, '}');
+    
+                if(
+                    this.functionObj[key].countCurlyBracketEnd != 0 && 
+                    (this.functionObj[key].countCurlyBracketStart == this.functionObj[key].countCurlyBracketEnd)
+                )this.functionObj[key].endLineNum = lineNum;
+
+                isFunctionExist = true;
+                //console.log(this.functionObj);
             }
-            console.log(this.functionObj[key].argument);
-
         }
 
-        //functionが
-        //それ以外の場所はMainとして行数を記録
-        if(lineNum == 0){
-
+        //functionじゃない場所をmainとして行数を取得
+        if(!isFunctionExist){
+            this.mainLineNum.push(lineNum);
         }
+
+        //console.log(this.mainLineNum);
     }
 
     getFuncName(code){
@@ -190,7 +206,7 @@ export class GrammerModel{
     translateExpression(code, lineNum){
         //TODO: ;を取り除く処理ロジックを変更する
         code = code.slice(0,-1);
-        switch (this.countEqualNum(code)){
+        switch (this.countValNum(code, '=')){
             case 0:
                 //比較演算子があるかどうかの判定が必要
 
@@ -282,11 +298,11 @@ export class GrammerModel{
         return code.replace(/\s/g,''); //全てのスペースを削除
     }
 
-    countEqualNum(code){
-        const eNum = code.split('=').length - 1; //イコールのカウントロジックを変更する
+    countValNum(code, val){
+        const vNum = code.split(val).length - 1; //イコールのカウントロジックを変更する
         //console.log('eNum = ' + eNum);
-        if(eNum == null) return 0;
-        else return eNum;
+        if(vNum == null) return 0;
+        else return vNum;
     }
 
     /*----------------------------------
@@ -319,6 +335,9 @@ export class GrammerModel{
     set variableObj(v){this._variableObj = v;}
     get layerNumber(){return this._layerNumber;}
     set layerNumber(v){this._layerNumber = v;}
+    get functionObj(){return this._functionObj;}
+    set functionObj(v){this._functionObj = v;}
+    //functionObj
 
 }
 

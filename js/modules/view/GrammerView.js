@@ -60,11 +60,17 @@ printOnConsole(test);
 function printOnConsole(val){
     console.log('hello, ' + val);
 }
+
+console.log('this');
+
+let j = 2;
+j++;
+
         `);
     }
 
-    getCodes(){
-        return this.editor.getValue();
+    getCodesArray(){
+        return this.editor.getValue().split('\n');
     }
 
 }
