@@ -8,26 +8,26 @@ const reservedWords = {
     let: 'var',
     var: 'var',
 
-    if: 0 ,
-    else: 0 ,
+    if: 'ctrlsta' ,
+    else: 'ctrlsta' ,
 
     break: 0 ,
     continue: 0 ,
     
-    switch: 0 ,
-    case: 0 ,
+    switch: 'ctrlsta' ,
+    case: 'ctrlsta' ,
 
-    do: 0 ,
-    while: 0 ,
+    do: 'ctrlsta' ,
+    while: 'ctrlsta' ,
 
     function: 0 ,
     return: 0 ,
 
-    for: 0 ,
-    in: 0 ,
+    for: 'ctrlsta' ,
+    in: 'ctrlsta' ,
 
-    try: 0 ,
-    catch: 0 ,
+    try: 'ctrlsta' ,
+    catch: 'ctrlsta' ,
 
     debugger: 0 ,
     default: 0 ,

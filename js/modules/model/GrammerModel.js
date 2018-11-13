@@ -8,7 +8,71 @@ export class GrammerModel{
         this.init();
     }
     init(){
-        this.variable = {};
+        this.variableObj = {};
+        this.functionObj = {};
+        this.controlStatements = [];
+        this.layerNumber;
+        this.isCommentFlag = false;
+    }
+
+    /*----------------------------------
+    Define Function Position
+    ----------------------------------*/
+    defineFunctionPos(code, lineNum){
+        //function の予約語があるかどうかを調べる(始まる点を調べる)
+        console.log(this.isResWdNameFuncExist(code), lineNum)
+        //予約語があったらファンクションオブジェクトを生成する
+        if(this.isResWdNameFuncExist(code)){
+            //TODO: 変数に含まれているか、functionで定義されているかをつまびらかにするべし。
+            //現在は頭にfuncitonがついていると言う前提で話を進める。
+            //'function'と'('の間にある文字列を取得する
+            console.log(this.getFuncName(code));
+            this.functionObj[this.getFuncName(code)] = {
+                startLineNum: lineNum,
+                endLineNum: 0,
+                // countRoundBracketStart: 0,
+                // countBracketEnd: 0,
+                arugument: '',
+                countCurlyBracketStart: 0,
+                countCurlyBraketEnd: 0,
+            }
+        }
+        //引数を取得する。丸括弧の開始数、終了数が同数
+        
+
+        //functionとして定義されているものは情報を舐める。もしendlinenumが定義されていれば情報は全て揃っているとみなし、処理は行わない
+        for(const key in this.functionObj){
+            if(this.functionObj[key].endLineNum != 0) continue;
+            //TODO: functionが書いてある行に()がある前提のコードになっている
+            if(this.functionObj[key].argument == 0){
+                this.functionObj[key].argument = code.slice(
+                    code.indexOf('(') + 1,
+                    code.lastIndexOf(')')
+                )
+            }
+            console.log(this.functionObj[key].argument);
+
+        }
+
+        //functionが
+        //それ以外の場所はMainとして行数を記録
+        if(lineNum == 0){
+
+        }
+    }
+
+    getFuncName(code){
+        return this.removeSpace(code)
+            .slice(
+                code.indexOf('function') + 'function'.length, 
+                code.indexOf('(') - 1
+            );
+    }
+
+    isResWdNameFuncExist(code){
+        return code.split(' ').some((el)=>{
+            if(el.indexOf('function') != -1) return true;
+        });
     }
 
     /*----------------------------------
@@ -34,24 +98,44 @@ export class GrammerModel{
     ----------------------------------*/
 
     translateToText(code, lineNum){
-        //console.log(this.countEqualNum(code));
         var code = code.replace(/^\s*/,''); //先頭のスペースorタブを削除
-        //console.log(code);
-        var outputText;
+        if(this.isComment(code))return `${code}</br>`;
         this.reservedWord = this.isReservedWordsExist(code);
-        //console.log(this.reservedWord);
-        outputText = this.translateByRules(this.reservedWord, code, lineNum);
+        const outputText = this.translateByRules(this.reservedWord, code, lineNum);
         return outputText;
     }
 
+    isComment(code){
+        if(code.indexOf('*/') != -1){
+            this.isCommentFlag = false;
+            return true;
+        }
+
+        if(this.isCommentFlag)return true;
+
+        switch(code.slice(0,2)){
+            case '/*':
+                this.isCommentFlag = true;
+            case '//':
+                return true;
+        }
+        
+        return false;
+    }
+
+
     translateByRules(reservedWord, code, lineNum){
-        //console.log('reservedWord = ' + reservedWord);
+        //console.log('reservedWord = ' + reservedWords[reservedWord]);
         const result = () => {
             if(reservedWord != false){ //予約語があった場合
                 switch(reservedWords[reservedWord]){
                     case 'var':
                         return this.translateVariable(reservedWord, code, lineNum);
                         // break;
+                    case 'ctrlsta':
+                        //()の中身を読み取る
+                        this.translateControlStatements(reservedWord, code, lineNum);
+                        break;
                     default:
                         return '翻訳中...';
                 }
@@ -67,6 +151,29 @@ export class GrammerModel{
         return result();
     }
 
+    translateControlStatements(reservedWord, code, lineNum){
+        console.log(reservedWord + 'だよーん');
+        switch(reservedWord){
+            case 'if':
+                this.controlStatements.push({
+                    ctrlsta: 'if',
+                    roundBracketsNum: 0,
+                    roundBracketsVal: '',
+                    curlyBracketsNum: 0,
+                    curlyBracketsVal: ''
+                })
+                if('')
+                console.log(this.controlStatements);
+
+
+                break;
+        }
+        //layerNumを + 1する
+        this.layerNumber++;
+
+    }
+
+
     translateVariable(reservedWord, code, lineNum){
         const result = () =>{
             const operand = this.getEachOperand(code);
@@ -75,19 +182,21 @@ export class GrammerModel{
             //TODO: return を要素だけ返すようにする
             this.addVariable(leftOpe, code);
 
-            return `<p class="line${lineNum+1}">変数(${reservedWord}) ${leftOpe} に ${rightOpe} を代入します。</p>`
+            return `<p class="line${lineNum+1}">変数<span>(${reservedWord}) ${leftOpe}</span> に <span>${rightOpe}</span> を代入します。</p>`
         }
         return result();
     }
 
     translateExpression(code, lineNum){
+        //TODO: ;を取り除く処理ロジックを変更する
+        code = code.slice(0,-1);
         switch (this.countEqualNum(code)){
-            case 1:
-                console.log('hit!');
-                //論理演算子？
+            case 0:
+                //比較演算子があるかどうかの判定が必要
 
-                //論理演算子じゃない時
-                return this.calcExpression(code);
+                break;
+            case 1:
+                return this.calcExpression(code, lineNum);
                 break;
             case 2:
             case 3:
@@ -99,22 +208,35 @@ export class GrammerModel{
 
     //左辺に右辺を代入する系
     calcExpression(code, lineNum){
-        console.log('Num = Num');
-        // A = a の場合
-        // console.log(code);
-        const operand = this.getEachOperand(code);
-        let leftOpe = operand[0];
-        let rightOpe = operand[1];
-        //console.log(operand);
-        //TODO: 変数を変更する系の処理をまとめる
-        this.changeVariableVal(leftOpe, this.evalExpression(rightOpe));
-        //console.log(this.variable);
-        return `<p class="line${lineNum+1}">${leftOpe} に ${rightOpe} を代入します。<br>
-        その結果、${leftOpe}の値は${this.variable[leftOpe]['val']}になります</p>`
+        //TODO: <=や+=を見極めるための簡単なテスト
+        const beforeEqual = this.revealOperatorBeforeEqual(code)
+        switch(beforeEqual){        
+            case '>':
+            case '<':
+            case '!':
+                return `<p>${eval(code)}</p>`
+            case '+':
+            case '-':
+            case '*':
+            case '/':
+            case '%':
+                const thisVal = code.slice(0,code.indexOf(beforeEqual));
+                code = code.replace(beforeEqual,'') + beforeEqual + thisVal;
+            default:
+                console.log('[値] = [値]');
+                // A = a の場合
+                console.log(code);
+                const operand = this.getEachOperand(code);
+                let leftOpe = operand[0];
+                let rightOpe = operand[1];
+                console.log(operand);
+                //TODO: 変数を変更する系の処理をまとめる
+                this.changeVariableVal(leftOpe, this.evalExpression(rightOpe));
+                //console.log(this.variable);
+                return `<p class="line${lineNum+1}"><span>${leftOpe}</span> に <span>${rightOpe}</span> を代入します。<br>
+                その結果、${leftOpe}の値は<span>${this.variableObj[leftOpe]['val']}</span>になります</p>`
 
-
-        // A += a の場合(NOT 論理演算子)
-        // A != a の場合(論理演算子)
+        }
         
 
         // A = function(){} の場合
@@ -124,8 +246,8 @@ export class GrammerModel{
 
     }
 
-    isCodeLogicalOperatpr(code){
-
+    revealOperatorBeforeEqual(code){
+        return code.split('')[code.indexOf('=') - 1];
     }
 
 
@@ -134,12 +256,10 @@ export class GrammerModel{
     }
 
     evalExpression(exp){
-        console.log('ここで右辺に変数があったら代入処理をする');
         //変数があるかどうかの判定
-        for(let key in this.variable){
+        for(let key in this.variableObj){
             let reg = new RegExp(key, 'g'); //正規表現に変数をもちいる方法
-            console.log(reg);
-            exp = exp.replace(reg,this.variable[key]['val']);
+            exp = exp.replace(reg,this.variableObj[key]['val']);
         }
         return eval(exp);
     }
@@ -151,7 +271,6 @@ export class GrammerModel{
     getEachOperand(code){
         const result = () =>{
             var val = this.removeSpace(code).split('=');
-            val[1] = val[1].slice(0,-1);//TODO: ;を取り除く処理の記述
             return val;
         };
         // console.log(code);
@@ -175,21 +294,20 @@ export class GrammerModel{
     ----------------------------------*/
     //変数・定数が宣言されているときに
     addVariable(varName, code){
-        console.log(varName,code);
         console.log('変数を代入');
+        console.log(varName,code);
         const value = this.evalVariable(varName,code);
-        this.variable[varName] = {
+        this.variableObj[varName] = {
             val: value,
             type: typeof value
         }
-
         console.log('!!------------!!');
-        console.log(this.variable[varName].val);
-        console.log(this.variable[varName].type);
+        console.log(this.variableObj[varName].val);
+        console.log(this.variableObj[varName].type);
     }
 
     changeVariableVal(varName, val){
-        this.variable[varName]['val'] = val;
+        this.variableObj[varName]['val'] = val;
         return false;
     }
 
@@ -197,8 +315,10 @@ export class GrammerModel{
         return new Function(`${code} return ${varName}`)();
     }
 
-    get variable(){return this._variable;}
-    set variable(v){this._variable = v;}
+    get variableObj(){return this._variableObj;}
+    set variableObj(v){this._variableObj = v;}
+    get layerNumber(){return this._layerNumber;}
+    set layerNumber(v){this._layerNumber = v;}
 
 }
 

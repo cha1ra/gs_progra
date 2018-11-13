@@ -41,16 +41,28 @@ export class TranslateController{
     translateEachCords(){
         this.gmv.clearText();
         const codes = this.gmv.getCodes().split('\n');
+        this.gmv.layerNumber = 0;
+        //TODO: レイヤー位置の決定
+        console.log('[Message] 関数情報を取得します。=====');
+        //関数があったらあらかじめ拾ってオブジェクトに格納する
         codes.forEach((el, i) => {
-            //console.log(el);
-            // try{
-                this.gmv.appendText(this.gmm.translateToText(el, i));
-            // }
-            // catch(e){
-            //     console.log('!-------エラーだってよ--------!');
-            // }
+            //console.log(el, i);
+            this.gmm.defineFunctionPos(el, i);
         });
-        console.log('result')
+
+        console.log('[Message] 制御構文の有無を確認します=====');
+        //全体に制御構文がいくつあるか、どこにあるかをマークアップ
+
+        console.log('[Message] 実際の計算を開始します。=====');
+        codes.forEach((el, i) => {
+            console.log(`- [開始]${i+1}行目の処理`);            
+            this.gmv.appendText(this.gmm.translateToText(el, i));
+            console.log(`- [終了]${i+1}行目の処理`);
+        });
+        console.log('[Message] 計算を終了します =====');
+        //TODO: 関数・変数オブジェクトの解放
+        //現在把握しているところでは、関数・変数・mainの行
+
     }
 
 

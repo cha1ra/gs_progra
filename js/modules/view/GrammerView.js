@@ -48,10 +48,18 @@ export class GrammerView{
         this.editor.session.setMode("ace/mode/javascript");
 
         this.editor.setValue(`
-let test = 1;
-test = 3;
-test = 3+4+5;
-test = test + 1;
+//if文を作るどー
+let test = 0;
+if(test >= 0){
+    test += 14;
+}
+test = 2;
+
+printOnConsole(test);
+
+function printOnConsole(val){
+    console.log('hello, ' + val);
+}
         `);
     }
 

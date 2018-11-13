@@ -6,6 +6,9 @@ $space:8px;
     padding:$space;
 }
 
+body{
+    font-size: 14px;
+}
 
 header{
     border-bottom: 1px solid #8CD790;
@@ -23,10 +26,6 @@ header{
     
         }
     }
-}
-
-#body{
-    position: absolute;
 }
 
 main{
@@ -49,7 +48,15 @@ main{
     border-right: 1px solid #757575;
     p{
         transition: 0.5s;
-        padding: 4px;
+        padding: 8px;
+        span{
+            padding:2px;
+            border-radius: 4px;
+            background-color: #8cd790;
+            font-size: 1.1rem;
+            //font-weight: bold;
+            //color:#8cd790;
+        }
     }
     p:hover{
         transition: 0.5s;
