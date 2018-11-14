@@ -39,20 +39,20 @@ export class TranslateController{
     ----------------------------------*/
 
     translateEachCords(){
-        this.gmv.clearText();
+        this.initEachStatus()
         const codes = this.gmv.getCodesArray();
-        this.gmv.layerNumber = 0;
         //TODO: レイヤー位置の決定
 
         console.log('[Message] 関数情報を取得します。=====');
         //関数があったらあらかじめ拾ってオブジェクトに格納する
         codes.forEach((el, i) => {
-            //console.log(el, i);
-            this.gmm.defineFunctionPos(el, i);
+            this.gmm.defineFunctionInfo(el, i);
         });
+        console.log('END\n\n');
 
         console.log('[Message] 制御構文の有無を確認します=====');
         //全体に制御構文がいくつあるか、どこにあるかをマークアップ
+        console.log('END\n\n');
 
         console.log('[Message] 実際の計算を開始します。=====');
 
@@ -61,28 +61,47 @@ export class TranslateController{
             //定義済みの関数を発見したらその処理をループする
             for(const key in this.gmm.functionObj){
                 if(codes[el].indexOf(key) != -1){
-                    console.log('ファンクションやでえ！');
+                    console.log(`関数${key}の処理を開始します`);
                     const start = this.gmm.functionObj[key].startLineNum;
                     const end = this.gmm.functionObj[key].endLineNum;
                     //代入処理が必要
-                    this.gmv.appendText(`<div class='func'><p>関数 ${key} が呼び出された！<br>処理を始めます。`);
+                    let resultHtml = `<div class='func'>関数 ${key} が呼び出された！<br><span class='${key}'>関数内</span>の処理を始めます。<div>`;
+                    const funcText = this.gmm.adjustFuncNameToText(key).replace(/\s/g,'%20');
+                    
+                    
+                    this.gmm.translateText(funcText,'ja').then((val) => {
+                        this.changeFunctionText(key, val);
+                    })
+
+                    //TODO: 再帰関数で記述する必要がある
                     for(let i=start; i<=end; i++){
-                        this.gmv.appendText(this.gmm.translateToText(codes[el], el));
+                        console.log(`-- [開始]${i+1}行目の処理`);
+                        resultHtml += this.gmm.translateToText(codes[i], i);
+                        console.log(`-- [終了]${i+1}行目の処理`);
                     }
-                    this.gmv.appendText('</div>');
+                    resultHtml += `</div></div>`;
+                    this.gmv.appendText(resultHtml);
                 }
             }
-
             this.gmv.appendText(this.gmm.translateToText(codes[el], el));
             console.log(`- [終了]${el+1}行目の処理`);
         })
 
-        console.log('[Message] 計算を終了します =====');
+        console.log('END\n\n');
         //TODO: 関数・変数オブジェクトの解放
         //現在把握しているところでは、関数・変数・mainの行
 
     }
 
+    changeFunctionText(key, text){
+        this.gmv.changeFunctionText(key,text);
+    }
+
+    initEachStatus(){
+        this.gmv.clearText();
+        this.gmv.layerNumber = 0;
+        this.gmm.mainLineNum = [];
+    }
 
     /*----------------------------------
     Graphic Controller

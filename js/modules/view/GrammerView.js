@@ -24,18 +24,34 @@ export class GrammerView{
     handleEvents(){
         this.editor.getSession().on('change', (e)=>{
             if(e.lines[0]==';'){
-                console.log(';を発見！');
+                console.log('[Comment];の入力を検知=====');
                 this.onSendCallBack();
+                return false;
             }
         });
+
+        $(window).keydown((e)=>{
+            if(event.shiftKey){
+                if(e.keyCode == 13){
+                    console.log('[Comment]Shift + Enterの入力を検知=====');
+                    this.onSendCallBack();
+                    return false;
+                }
+            }
+        })
     }
 
     clearText(){
+        console.log('[Message]メッセージの内容を削除します=====')
         this.$grammer.empty();
     }
 
     appendText(text){
         this.$grammer.append(text);
+    }
+
+    changeFunctionText(funcName,text){
+        $('.' + funcName).html(`「${text}」`);
     }
 
     loadAceSettings(){
@@ -55,16 +71,21 @@ if(test >= 0){
 }
 test = 2;
 
-printOnConsole(test);
+printOnConsoleByThisFunction(test);
 
-function printOnConsole(val){
+function printOnConsoleByThisFunction(val){
     console.log('hello, ' + val);
+    let k = 0;
+    k += 1;
 }
 
 console.log('this');
 
 let j = 2;
 j++;
+
+j = 3;
+j += 4;
 
         `);
     }

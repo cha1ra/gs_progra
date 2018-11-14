@@ -34,5 +34,7 @@ export class GraphicView{
         }
     }
 
+    
+
 }
 export default GraphicView

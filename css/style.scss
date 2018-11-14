@@ -59,9 +59,24 @@ main{
         }
     }
     .func{
-        background-color: #c5e99b;
+        //background-color: #c5e99b;
+        padding: $space;
+        transition: 0.5s;
+        border: 1px solid #c5e99b;
+        div{
+            border: 1px solid #c5e99b;
+            background-color: #fff;
+            margin: $space;
+        }
+        span{
+            font-size: 1.1rem;     
+        }
     }
     p:hover{
+        transition: 0.5s;
+        background-color: #c5e99b;   
+    }
+    .func:hover{
         transition: 0.5s;
         background-color: #c5e99b;   
     }

@@ -14,12 +14,60 @@ export class GrammerModel{
         this.controlStatements = [];
         this.layerNumber;
         this.isCommentFlag = false;
+        this.translatorUrl = 'https://script.google.com/macros/s/AKfycbwTwAqaxRH-JzmeARtDhk1VXtYS3ERO1I1OPhXuLSPf4iRGhxM/exec';
+    }
+
+    /*----------------------------------
+    Translator
+    ----------------------------------*/
+    adjustFuncNameToText(funcName){
+        funcName = funcName.split(/([A-Z][a-z]*)/).filter((el)=>{
+            if(el == '' || el == undefined)return false;
+            return true;
+        });
+        funcName.forEach((el,i)=>{
+            //Topは大文字、それ以外は小文字に
+            if(i==0){
+                funcName[i] = el.charAt(0).toUpperCase() + el.slice(1);
+            }else{
+                funcName[i] = el.charAt(0).toLowerCase() + el.slice(1);
+            }
+        });
+        funcName = funcName.join(' ')
+
+        console.log(`関数 ${funcName} を翻訳します...`);
+        return funcName;
+    }
+
+    translateText(thisText,targetLang){
+        return new Promise((resolve, reject) =>{
+            $.ajax({
+                type:'POST',
+                url: './php/translation.php',
+                data:{
+                    url: this.translatorUrl,
+                    text: thisText,
+                    source:'en',
+                    target: targetLang
+                }
+            })
+            .then(
+                (data)=>{
+                    return resolve(data);
+                },
+                (err)=>{
+                    console.log('error: ');
+                    console.log(err);
+                    return reject(err);
+                }
+            );
+        })
     }
 
     /*----------------------------------
     Define Function Position
     ----------------------------------*/
-    defineFunctionPos(code, lineNum){
+    defineFunctionInfo(code, lineNum){
         let isFunctionExist = false;
 
         //function の予約語があるかどうかを調べる(始まる点を調べる)
@@ -28,7 +76,7 @@ export class GrammerModel{
             //FIXME: 変数に含まれているか、functionで定義されているかをつまびらかにするべし。
             //現在は頭にfuncitonがついていると言う前提で話を進める。
             //'function'と'('の間にある文字列を取得する
-            console.log(this.getFuncName(code));
+            console.log(`関数 ${this.getFuncName(code)} を発見しました。`);
             this.functionObj[this.getFuncName(code)] = {
                 startLineNum: lineNum,
                 endLineNum: 0,
@@ -37,6 +85,7 @@ export class GrammerModel{
                 argument: '',
                 countCurlyBracketStart: 0,
                 countCurlyBracketEnd: 0,
+                returnValue: ''
             }
         }
         
@@ -58,11 +107,18 @@ export class GrammerModel{
                 //{と}の数の分だけカウンターを上下
                 this.functionObj[key].countCurlyBracketStart += this.countValNum(code,'{');
                 this.functionObj[key].countCurlyBracketEnd += this.countValNum(code, '}');
-    
+
                 if(
                     this.functionObj[key].countCurlyBracketEnd != 0 && 
                     (this.functionObj[key].countCurlyBracketStart == this.functionObj[key].countCurlyBracketEnd)
-                )this.functionObj[key].endLineNum = lineNum;
+                ){
+                    this.functionObj[key].endLineNum = lineNum;
+                    console.log(`${key} の情報取得が完了しました。`);
+                    console.log(this.functionObj[key]);
+                }
+
+                //return文があったら変化する。
+
 
                 isFunctionExist = true;
                 //console.log(this.functionObj);
@@ -115,7 +171,11 @@ export class GrammerModel{
 
     translateToText(code, lineNum){
         var code = code.replace(/^\s*/,''); //先頭のスペースorタブを削除
-        if(this.isComment(code))return `${code}</br>`;
+        console.log(`処理対象コード:\n${code}`)
+        if(this.isComment(code)){
+            console.log('これはコメント文です。');
+            return `${code}</br>`
+        };
         this.reservedWord = this.isReservedWordsExist(code);
         const outputText = this.translateByRules(this.reservedWord, code, lineNum);
         return outputText;
@@ -311,15 +371,11 @@ export class GrammerModel{
     //変数・定数が宣言されているときに
     addVariable(varName, code){
         console.log('変数を代入');
-        console.log(varName,code);
         const value = this.evalVariable(varName,code);
         this.variableObj[varName] = {
             val: value,
             type: typeof value
         }
-        console.log('!!------------!!');
-        console.log(this.variableObj[varName].val);
-        console.log(this.variableObj[varName].type);
     }
 
     changeVariableVal(varName, val){
