@@ -19,6 +19,7 @@ export class GrammerView{
 
     bindDomElement(){
         this.$grammer = $('#grammer');
+        this.$localization = $('#localization>img');
     }
 
     handleEvents(){
@@ -39,6 +40,18 @@ export class GrammerView{
                 }
             }
         })
+
+        this.$localization.on('click',(e)=>{
+            const locale = e.target.alt;
+            $('.mypage').text(localization.htmlMyPage[locale]);
+            $('.about').text(localization.htmlAbout[locale]);
+            $('.login').text(localization.htmlLogin[locale]);
+            $('#logo').attr('src', './img/logo-nav-' + locale + '.png');
+            $('#progra-title').attr('placeholder',localization.htmlPrograTitle[locale]);
+            $('.save-text').text(localization.htmlSaveText[locale]);
+            this.onSendCallBack(locale);
+        })
+
     }
 
     clearText(){
@@ -64,12 +77,21 @@ export class GrammerView{
         this.editor.session.setMode("ace/mode/javascript");
 
         this.editor.setValue(`
-//if文を作るどー
+
+/*---------------------
+';'を入力 or Shift+Enter キーで
+プログラムを翻訳開始
+---------------------*/
+
 let test = 0;
 if(test >= 0){
     test += 14;
 }
 test = 2;
+
+for(let j=0; j<3; j++){
+    console.log(j);
+}
 
 printOnConsoleByThisFunction(test);
 

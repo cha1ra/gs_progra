@@ -15,6 +15,7 @@ export class GrammerModel{
         this.layerNumber;
         this.isCommentFlag = false;
         this.translatorUrl = 'https://script.google.com/macros/s/AKfycbwTwAqaxRH-JzmeARtDhk1VXtYS3ERO1I1OPhXuLSPf4iRGhxM/exec';
+        this.locale;
     }
 
     /*----------------------------------
@@ -98,10 +99,7 @@ export class GrammerModel{
                 //引数の取得
                 //FIXME: functionが書いてある行に()がある前提のコードになっている
                 if(this.functionObj[key].argument == 0){
-                    this.functionObj[key].argument = code.slice(
-                        code.indexOf('(') + 1,
-                        code.lastIndexOf(')')
-                    ).split(',');
+                    this.functionObj[key].argument = this.getRoundBracket(code).split(',');
                 }
     
                 //{と}の数の分だけカウンターを上下
@@ -146,6 +144,60 @@ export class GrammerModel{
             if(el.indexOf('function') != -1) return true;
         });
     }
+
+    getRoundBracket(code){
+        return code.slice(
+            code.indexOf('(') + 1,
+            code.lastIndexOf(')')
+        )
+    }
+
+    /*----------------------------------
+    Define CurlyBracket Information
+    ----------------------------------*/
+    defineCurlyBracketInfo(code, lineNum){
+        this.reservedWord = this.isReservedWordsExist(code);
+        console.log(this.reservedWord);
+        switch(this.reservedWord){
+            case 'else':
+            case 'if':
+            case 'while':
+            case 'for':
+                this.controlStatements.push({
+                    ctrlsta: this.reservedWord,
+                    startLineNum: lineNum,
+                    endLineNum: 0,
+                    condSentence: this.getRoundBracket(code), //FIXME: 先頭行に()がある前提のコードになっている
+                    countCurlyBracketStart: 0,
+                    countCurlyBracketEnd: 0,
+                })
+                break;
+            default:
+                break;
+        }
+        this.controlStatements.forEach((el,i)=>{
+            if(el.endLineNum != 0){
+                return false;
+            }else{
+                //{と}の数の分だけカウンターを上下
+                this.controlStatements[i].countCurlyBracketStart += this.countValNum(code,'{');
+                this.controlStatements[i].countCurlyBracketEnd += this.countValNum(code, '}');
+
+                if(
+                    this.controlStatements[i].countCurlyBracketEnd != 0 && 
+                    (this.controlStatements[i].countCurlyBracketStart == this.controlStatements[i].countCurlyBracketEnd)
+                ){
+                    this.controlStatements[i].endLineNum = lineNum;
+                    console.log(`${el.ctrlsta} の情報取得が完了しました。`);
+                    console.log(this.controlStatements[i]);
+                }
+                //console.log(this.functionObj);
+            }
+        })
+        console.log('fin');
+        console.log(this.controlStatements);
+    }
+
 
     /*----------------------------------
     Boolean Function
@@ -210,7 +262,7 @@ export class GrammerModel{
                         // break;
                     case 'ctrlsta':
                         //()の中身を読み取る
-                        this.translateControlStatements(reservedWord, code, lineNum);
+                        //this.translateControlStatements(reservedWord, code, lineNum);
                         break;
                     default:
                         return '翻訳中...';
@@ -231,13 +283,13 @@ export class GrammerModel{
         console.log(reservedWord + 'だよーん');
         switch(reservedWord){
             case 'if':
-                this.controlStatements.push({
-                    ctrlsta: 'if',
-                    roundBracketsNum: 0,
-                    roundBracketsVal: '',
-                    curlyBracketsNum: 0,
-                    curlyBracketsVal: ''
-                })
+                // this.controlStatements.push({
+                //     ctrlsta: 'if',
+                //     roundBracketsNum: 0,
+                //     roundBracketsVal: '',
+                //     curlyBracketsNum: 0,
+                //     curlyBracketsVal: ''
+                // })
                 if('')
                 console.log(this.controlStatements);
 
@@ -258,9 +310,18 @@ export class GrammerModel{
             //TODO: return を要素だけ返すようにする
             this.addVariable(leftOpe, code);
 
-            return `<p class="line${lineNum+1}">変数<span>(${reservedWord}) ${leftOpe}</span> に <span>${rightOpe}</span> を代入します。</p>`
+            return eval('`'+localization.translateVariable[this.locale]+'`');
+            //return `<p class="line${lineNum+1}">${this.letOrConst(reservedWord)}<span>(${reservedWord}) ${leftOpe}</span> に <span>${rightOpe}</span> を代入します。</p>`
         }
         return result();
+    }
+
+    letOrConst(val){
+        if(val == 'const'){
+            return localization.const[this.locale];
+        }else{
+            return localization.var[this.locale];
+        }
     }
 
     translateExpression(code, lineNum){
@@ -309,8 +370,7 @@ export class GrammerModel{
                 //TODO: 変数を変更する系の処理をまとめる
                 this.changeVariableVal(leftOpe, this.evalExpression(rightOpe));
                 //console.log(this.variable);
-                return `<p class="line${lineNum+1}"><span>${leftOpe}</span> に <span>${rightOpe}</span> を代入します。<br>
-                その結果、${leftOpe}の値は<span>${this.variableObj[leftOpe]['val']}</span>になります</p>`
+                return eval('`'+localization.calcExpression[this.locale]+'`');
 
         }
         
@@ -393,6 +453,8 @@ export class GrammerModel{
     set layerNumber(v){this._layerNumber = v;}
     get functionObj(){return this._functionObj;}
     set functionObj(v){this._functionObj = v;}
+    get locale(){return this._locale;}
+    set locale(v){this._locale = v;}
     //functionObj
 
 }

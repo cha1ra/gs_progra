@@ -13,7 +13,7 @@ export class TranslateController{
         // this.gv.appendText(result);
 
         this.translateEachCords();
-        this.gpv.appendVariable(this.gmm.variable);
+        this.gpv.appendVariable(this.gmm.variableObj);
         
 
     }
@@ -26,6 +26,7 @@ export class TranslateController{
         this.gpv = new GraphicView({
             onSendCallback: this.drawCords
         });
+        this.gmm.locale = 'ja'
     }
 
     bindMethods(){
@@ -38,8 +39,9 @@ export class TranslateController{
     Grammer Controller
     ----------------------------------*/
 
-    translateEachCords(){
-        this.initEachStatus()
+    translateEachCords(lang){
+        this.initEachStatus();
+        this.changeLocale(lang);
         const codes = this.gmv.getCodesArray();
         //TODO: レイヤー位置の決定
 
@@ -52,6 +54,10 @@ export class TranslateController{
 
         console.log('[Message] 制御構文の有無を確認します=====');
         //全体に制御構文がいくつあるか、どこにあるかをマークアップ
+        codes.forEach((el, i) => {
+            this.gmm.defineCurlyBracketInfo(el, i);
+        });
+
         console.log('END\n\n');
 
         console.log('[Message] 実際の計算を開始します。=====');
@@ -65,11 +71,12 @@ export class TranslateController{
                     const start = this.gmm.functionObj[key].startLineNum;
                     const end = this.gmm.functionObj[key].endLineNum;
                     //代入処理が必要
-                    let resultHtml = `<div class='func'>関数 ${key} が呼び出された！<br><span class='${key}'>関数内</span>の処理を始めます。<div>`;
+                    //let resultHtml = `<div class='func'>関数 ${key} が出現！<br><span class='${key}'>関数内</span>の処理を始めます。<div>`;
+                    let resultHtml = eval('`' + localization.functionText[this.gmm.locale] + '`');
                     const funcText = this.gmm.adjustFuncNameToText(key).replace(/\s/g,'%20');
                     
-                    
-                    this.gmm.translateText(funcText,'ja').then((val) => {
+                    console.log(this.gmm.locale);
+                    this.gmm.translateText(funcText,this.gmm.locale).then((val) => {
                         this.changeFunctionText(key, val);
                     })
 
@@ -103,40 +110,28 @@ export class TranslateController{
         this.gmm.mainLineNum = [];
     }
 
+    changeLocale(lang){
+        if(lang != undefined){
+            this.gmm.locale = lang;
+            console.log(`[Message]Localeが${this.gmm.locale}に変更されました=====`);
+        }
+        return false;
+    }
+    
     /*----------------------------------
     Graphic Controller
     ----------------------------------*/
 
     drawCords(){
-        this.gpv.appendVariable(this.gmm.variable);
+        this.gpv.appendVariable(this.gmm.variableObj);
     }
 
 }
-
-
-/*----------------------------------
-ルール決め is 大事
-
-while.if.for文があったら{}を一括りにする
-;があったら一文とみなす
-
-----------------------------------*/
-
-
-
-
-
-
-
-
 
 function debug(desc, ex){
     console.log('Debug :' + desc);
     console.log(ex);
 }
-
-
-
 
 
 

@@ -5,38 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/title.min.css">
     <link rel="stylesheet" href="./css/style.min.css">
     <link rel="shortcut icon" href="./img/favicon.ico" type="image/x-icon">
+    <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.4.1/firebaseui.css" />
+
     <title>プロぐら - プログラムを文章化・可視化してみよう！</title>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <img src="./img/logo.png" alt="" id="logo">
-            <nav>
-                <li>マイページ</li>
-                <li>駆け込み寺</li>
-                <li>ぷろぐらについて</li>
-                <li>新規登録</li>
-                <li>ログイン</li>
-            </nav>
-        </div>
-    </header>
-    <main>
-        <div class="container">
-            <div id="editor"></div>
-            <div id="grammer">grammer</div>
-            <div id="graphic"></div>
-        </div>
-    </main>
-    <footer>
-        <div class="container">
-            <p>2018 cha1ra.com All Rights Reserved</p>
-        </div>
-    </footer>
+    <div id="title">
+        <div id="white-bg"></div>
+        <object id="svg-line-logo" type="image/svg+xml" data="./img/gra-svg.svg"></object>
+        <object id="svg-logo" type="image/svg+xml" data="./img/logo.svg"></object>
+    
+        <script src="./js/lib/jquery-3.3.1.min.js"></script>
+        <!-- <script src="./js/lib/p5.min.js"></script> -->
+        <script src="./js/lib/vivus.js"></script>
+        <script src="./js/lib/pathformer.js"></script>
+        <script>
+            setTimeout(()=>{
+                $('#svg-logo').fadeIn();
+            },500);
+            new Vivus('svg-line-logo', {
+                duration: 120 ,
+                start: 'autostart',
+                type: 'delayed',
+                pathTimingFunction: Vivus.EASE_IN,
+                animTimingFunction: Vivus.EASE_IN
+            },function(){
+                $('#white-bg').slideDown('fast');
+                setTimeout(function(){
+                    $('#svg-logo').fadeOut(500, ()=>{
+                        $('#svg-line-logo').css('display','none');
+                        $('#index').fadeIn();
+                    });
+                },1000);
+            });
+    
+        </script>
+    </div>
+
+    <div id="index">
+        <header>
+            <div class="container">
+                <img src="./img/logo-nav-ja.png" alt="" id="logo" class='main'>
+                <nav>
+                    <li class='mypage'>マイページ</li>
+                    <li class='about'>プロぐらについて</li>
+                    <li class='login'>新規登録 / ログイン</li>
+                </nav>
+            </div>
+        </header>
+        <main>
+            <div id="login">
+                <div class="container">
+                    <h1>Login</h1>
+                </div>
+                <div class="container">
+                    <div id="firebaseui-auth-container"></div>
+                </div>
+            </div>
+            <div id="mypage">
+                <div class="container">
+                    <h1>My Codes</h1>
+                </div>
+                <div class="container">
+                    <div id="my-codes"></div>
+                </div>     
+            </div>
+            <div id="about">
+                <div class="container">
+                    <iframe src="//www.slideshare.net/slideshow/embed_code/key/ktHweFODKAkxUS" width="595" height="485" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+                </div>
+            </div>
+            <div id="main">
+                <div class="container">
+                    <input type="text" name="title" id="progra-title" placeholder="タイトルを入力...">
+                    <div class="save">
+                        <div>
+                            <p class='save-text'>コードを保存</p>
+                            (Add to Mypage)
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="content">
+                        <h2>Pro<span>gra</span>m</h2>
+                        <div id="editor"></div>
+                    </div>
+                    <div class="content">
+                        <h2><span>Gra</span>mmer</h2>
+                        <div id="grammer"></div>
+                    </div>
+                    <div class="content">
+                        <h2><span>Gra</span>phic</h2>
+                        <div id="graphic"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <div class="container">
+                <p>2018 cha1ra.com All Rights Reserved</p>
+                <div id="localization">
+                    <img src="./img/ja.png" alt="ja">
+                    <!-- <img src="./img/en.png" alt="en"> -->
+                    <img src="./img/zh-cn.png" alt="zh-cn">
+                </div>
+            </div>
+        </footer>
+    </div>
     <script src="./js/lib/jquery-3.3.1.min.js"></script>
-    <!-- <script src="./js/lib/p5.min.js"></script> -->
     <script src="./js/lib/ace/ace.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.7/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/firebaseui/3.4.1/firebaseui.js"></script>
+    <script src="./js/firestore.js"></script>
     <script src="./js/data.js"></script>
     <script type="module" src="./js/index.js"></script>
     <script>
