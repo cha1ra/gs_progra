@@ -19,6 +19,7 @@ export class GraphicView{
     }
 
     clearGraphicDiv(){
+        console.log('[Message]Graphicの内容を削除します=====')
         this.$graphic.empty();
     }
 
@@ -29,9 +30,12 @@ export class GraphicView{
     appendVariable(variable){
         console.log(variable);
         for(let key in variable){
-
-            this.$graphic.append(`<p>${key} = ${variable[key].val}</p>`);
+            this.$graphic.append(`<p>${key} : ${variable[key].val}</p>`);
         }
+    }
+
+    appendText(text){
+        this.$graphic.append(text);
     }
 
     

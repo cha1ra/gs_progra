@@ -6,11 +6,7 @@ body {
   font-size: 14px;
 }
 
-body {
-  background-color: white;
-}
-
-#title {
+#index {
   display: none;
 }
 
@@ -188,6 +184,18 @@ main h2 span {
   transition: 0.5s;
   background-color: #c5e99b;
   border-radius: 4px;
+}
+
+#graphic h3 {
+  font-size: 1.1rem;
+  border-bottom: 1px solid #c5e99b;
+  margin-bottom: 8px;
+  padding-left: 8px;
+}
+
+#graphic p {
+  padding-left: 8px;
+  padding-bottom: 8px;
 }
 
 #my-codes {

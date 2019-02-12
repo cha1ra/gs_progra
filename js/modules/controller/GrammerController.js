@@ -13,7 +13,6 @@ export class TranslateController{
         // this.gv.appendText(result);
 
         this.translateEachCords();
-        this.gpv.appendVariable(this.gmm.variableObj);
         
 
     }
@@ -98,6 +97,12 @@ export class TranslateController{
         //TODO: 関数・変数オブジェクトの解放
         //現在把握しているところでは、関数・変数・mainの行
 
+        console.log(`[Message] 描画処理の開始=====`);
+        this.gpv.clearGraphicDiv();
+        this.gpv.appendText('<h3>Value</h3>');
+        this.gpv.appendVariable(this.gmm.variableObj);
+        //this.gpv.appendText('<h3>Function</h3>');
+
     }
 
     changeFunctionText(key, text){
@@ -108,6 +113,7 @@ export class TranslateController{
         this.gmv.clearText();
         this.gmv.layerNumber = 0;
         this.gmm.mainLineNum = [];
+        this.gmm.variableObj = {};
     }
 
     changeLocale(lang){

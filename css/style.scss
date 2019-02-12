@@ -12,14 +12,14 @@ body{
 
 //TODO:これを外す
 body{
-    background-color: white;
+    //background-color: white;
 }
 #title{
-    display: none;
+    //display: none;
 }
 
 #index{
-    //display:none;
+    display:none;
 }
 #login{
     display: none;
@@ -196,6 +196,16 @@ main{
 
 #graphic{
     //background-color: aqua;
+    h3{
+        font-size: 1.1rem;
+        border-bottom: 1px solid #c5e99b;
+        margin-bottom: $space;
+        padding-left: $space;
+    }
+    p{
+        padding-left: $space;
+        padding-bottom: $space;
+    }
 }
 
 #my-codes{
