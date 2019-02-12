@@ -1,6 +1,8 @@
 # gs_progra
-Created for JavaScript Hackathon
-
+Created for JavaScript Hackathon  
+  
+This product was created by **Original MVC Framework** (なんちゃってMVCモデル)  
+  
 # Demo
 
 ## Top
